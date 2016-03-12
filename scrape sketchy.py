@@ -53,6 +53,9 @@ def str2fn(string):
 	return string.replace("/",",").strip()
 	#return "".join([c for c in string if c.isalpha() or c.isdigit() or c==' ']).rstrip()
 	
+def splittitle(string):
+	return num, name
+	
 chapter = ""
 with open(os.path.join("output","output_multi.tsv"),'w') as output_file:
 	out_multi = csv.writer(output_file,delimiter='\t')
@@ -69,7 +72,9 @@ with open(os.path.join("output","output_multi.tsv"),'w') as output_file:
 			section = cleantxt(driver.find_element_by_tag_name('h1'))
 			chapters = driver.find_elements_by_class_name('course-chapter')
 			for chapter in chapters:
-				chp_num, chp_name = cleantxt(chapter.find_element_by_tag_name('h2')).split('-')
+				chp_header = cleantxt(chapter.find_element_by_tag_name('h2')).split('-')
+				chp_num = chp_header[0]
+				chp_name = "-".join(chp_header[1:])
 				review_buttons = chapter.find_elements_by_class_name('btn-review')
 				#review_data = chapter.find_elements_by_class_name('litetooltip-hotspot-container')
 				for rbtn in review_buttons:
@@ -84,10 +89,12 @@ with open(os.path.join("output","output_multi.tsv"),'w') as output_file:
 						dh = img.get_attribute("data-height")
 						dw = img.get_attribute("data-width")
 						sketch_title = cleantxt(sketch_container.find_element_by_id('review_modal_title'))
-						sketch_num, sketch_name = sketch_title.split("-")
+						sketch_header = sketch_title.split("-")
+						sketch_num = sketch_header[0]
+						sketch_name = "-".join(sketch_header[1:])
 						tags = 'sketchy.%s.%s.%s' % (mktag(section), mktag(chp_name), mktag(sketch_name))
 						img_src = img.get_attribute("src")
-						img_nn = str2fn("%s.png" % tags)
+						img_nn = str2fn("%s.jpg" % tags)
 						print img_src,img_nn
 						img_f = os.path.join('output',img_nn)
 						if not os.path.exists(img_f):
@@ -100,7 +107,7 @@ with open(os.path.join("output","output_multi.tsv"),'w') as output_file:
 							img_html = img_template % img_nn
 							spot_html = spot_template % (x, y)
 							sol_html = sol_template %  (x, y, txt)
-							out.writerow([section,chp_num,chp_name,sketch_num,sketch_name,img_html,index,spot_html,sol_html,tags,img_nn,dw,dh,x,y,txt])
+							out.writerow([section,chp_num+chp_name,sketch_num+sketch_name,index,img_html,spot_html,sol_html,tags,img_nn,dw,dh,x,y,txt])
 						#out_multi.writerow([section,chp_num,chp_name,sketch_num,sketch_name,img_html,'NA',"".join(spot_html),"".join(sol_html),tags,img_nn,dw,dh,"".join(x),"".join(y),txt])
 						#print image_container.get_attribute('innerHTML')
 						#container = sketch_container.find_element_by_id("review_modal")
