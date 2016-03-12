@@ -45,10 +45,9 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
-*.png
 *.zip
-*.jpg
 *.tsv
 *.tsv
 auth.py
 *.pyc
+*.png
