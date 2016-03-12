@@ -50,3 +50,5 @@ Temporary Items
 *.jpg
 *.tsv
 *.tsv
+auth.py
+*.pyc

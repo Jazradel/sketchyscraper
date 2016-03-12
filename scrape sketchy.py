@@ -7,10 +7,9 @@ import time
 import os
 import urllib
 import csv
+import auth
 			
 main_url = "https://www.sketchymedical.com/courses"
-userName = "@gmail.com"
-password = ""
 
 img_template = """<img src="%s" />"""
 spot_template = """<div class="hotspot" style="left:%s%%;top: %s%%;"></div>"""
@@ -31,8 +30,8 @@ time.sleep(1) #this doesn't help. sometimes the password form just won't fill
 user = driver.find_element_by_xpath("//input[@type='email']")
 pass2 = driver.find_element_by_xpath("//input[@type='password']")
 
-user.send_keys(userName)
-pass2.send_keys(password)
+user.send_keys(auth.userName)
+pass2.send_keys(auth.password)
 loginform = driver.find_element_by_class_name('btn-signin')
 loginform.click()
 
@@ -57,9 +56,9 @@ def str2fn(string):
 	#return "".join([c for c in string if c.isalpha() or c.isdigit() or c==' ']).rstrip()
 	
 def splittitle(elem):
-	chp_header = cleanelem(chapter.find_element_by_tag_name('h2')).split('-')
-	chp_num = chp_header[0]
-	chp_name = cleantxt("-".join(chp_header[1:]))
+	header = cleanelem(elem).split('-')
+	num = cleantxt(header[0])
+	name = cleantxt("-".join(header[1:]))
 	return num, name
 	
 chapter = ""
@@ -78,9 +77,7 @@ with open(os.path.join("output","output_multi.tsv"),'w') as output_file:
 			section = cleanelem(driver.find_element_by_tag_name('h1'))
 			chapters = driver.find_elements_by_class_name('course-chapter')
 			for chapter in chapters:
-				chp_header = cleanelem(chapter.find_element_by_tag_name('h2')).split('-')
-				chp_num = chp_header[0]
-				chp_name = cleantxt("-".join(chp_header[1:]))
+				chp_num, chp_name = splittitle(chapter.find_element_by_tag_name('h2'))
 				review_buttons = chapter.find_elements_by_class_name('btn-review')
 				#review_data = chapter.find_elements_by_class_name('litetooltip-hotspot-container')
 				for rbtn in review_buttons:
@@ -94,9 +91,7 @@ with open(os.path.join("output","output_multi.tsv"),'w') as output_file:
 						img = sketch_container.find_element_by_tag_name('img')
 						dh = img.get_attribute("data-height")
 						dw = img.get_attribute("data-width")
-						sketch_header = cleanelem(sketch_container.find_element_by_id('review_modal_title')).split("-")
-						sketch_num = sketch_header[0]
-						sketch_name = cleantxt("-".join(sketch_header[1:]))
+						sketch_num, sketch_name = splittitle(sketch_container.find_element_by_id('review_modal_title'))
 						tags = 'sketchy.%s.%s.%s' % (mktag(section), mktag(chp_name), mktag(sketch_name))
 						#handle images
 						img_src = img.get_attribute("src")
@@ -115,10 +110,10 @@ with open(os.path.join("output","output_multi.tsv"),'w') as output_file:
 							txt = cleanelem(hs.find_element_by_class_name('data-container'))
 							spot_html = spot_template % (x, y)
 							sol_html = sol_template %  (x, y, txt)
-							multi_html += spot_html + sol_html
-							title = "%s : %s %s : %s %s" % (section, chp_num, chp_name, sketch_num, sketch_name)
+							multi_html.append("%s%s" % (spot_html, sol_html))
+							title = "%s : %s - %s : %s - %s" % (section, chp_num, chp_name, sketch_num, sketch_name)
 							out.writerow([title,section,chp_num,chp_name,sketch_num,sketch_name,index,img_html,spot_html[-1],sol_html[-1],tags,img_nn,dw,dh,x,y,txt])
-						out_multi.writerow([title,section,chp_num,chp_name,sketch_num,sketch_name,img_html,"".join(multi_html),tags])
+						out_multi.writerow([title,section,chp_num,chp_name,sketch_num,sketch_name,img_html,"\n".join(multi_html),tags])
 						#print image_container.get_attribute('innerHTML')
 						#container = sketch_container.find_element_by_id("review_modal")
 						#print container.get_attribute('innerHTML')
