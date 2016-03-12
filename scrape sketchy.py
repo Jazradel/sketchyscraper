@@ -9,8 +9,8 @@ import urllib
 import csv
 			
 main_url = "https://www.sketchymedical.com/courses"
-userName = "jameslkau@gmail.com"
-password = "skejKil0"
+userName = "@gmail.com"
+password = ""
 
 img_template = """<img src="%s" />"""
 spot_template = """<div class="hotspot" style="left:%s%%;top: %s%%;"></div>"""
