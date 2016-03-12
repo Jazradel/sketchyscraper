@@ -93,22 +93,27 @@ with open(os.path.join("output","output_multi.tsv"),'w') as output_file:
 						sketch_num = sketch_header[0]
 						sketch_name = "-".join(sketch_header[1:])
 						tags = 'sketchy.%s.%s.%s' % (mktag(section), mktag(chp_name), mktag(sketch_name))
+						#handle images
 						img_src = img.get_attribute("src")
 						img_nn = str2fn("%s.jpg" % tags)
 						print img_src,img_nn
 						img_f = os.path.join('output',img_nn)
 						if not os.path.exists(img_f):
 							urllib.urlretrieve(img_src,img_f)
+						img_html = img_template % img_nn
+						#handle hotspots
 						hotspots = sketch_container.find_elements_by_class_name('hotspot')
+						spot_html = []
+						sol_html = []
 						for index,hs in enumerate(hotspots):	
 							x = hs.get_attribute('data-hotspot-x')
 							y = hs.get_attribute('data-hotspot-y')
 							txt = cleantxt(hs.find_element_by_class_name('data-container'))
-							img_html = img_template % img_nn
-							spot_html = spot_template % (x, y)
-							sol_html = sol_template %  (x, y, txt)
-							out.writerow([section,chp_num+chp_name,sketch_num+sketch_name,index,img_html,spot_html,sol_html,tags,img_nn,dw,dh,x,y,txt])
-						#out_multi.writerow([section,chp_num,chp_name,sketch_num,sketch_name,img_html,'NA',"".join(spot_html),"".join(sol_html),tags,img_nn,dw,dh,"".join(x),"".join(y),txt])
+							spot_html += spot_template % (x, y)
+							sol_html += sol_template %  (x, y, txt)
+							title = section + chp_num + chp_name + sketch_num + sketch_name
+							out.writerow([title,section,chp_num,chp_name,sketch_num,sketch_name,index,img_html,spot_html[-1],sol_html[-1],tags,img_nn,dw,dh,x,y,txt])
+						out_multi.writerow([title,section,chp_num,chp_name,sketch_num,sketch_name,img_html,"".join(spot_html),"".join(sol_html),tags])
 						#print image_container.get_attribute('innerHTML')
 						#container = sketch_container.find_element_by_id("review_modal")
 						#print container.get_attribute('innerHTML')
