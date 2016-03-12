@@ -96,13 +96,15 @@ with open(os.path.join("output","output_multi.tsv"),'w') as output_file:
 						#handle images
 						img_src = img.get_attribute("src")
 						img_nn = str2fn("%s.jpg" % tags)
+						img_nn_png = str2fn("%s.png" % tags)
 						print img_src,img_nn
-						img_f = os.path.join('output',img_nn)
+						img_f = os.path.join('output',img_nn_png)
 						if not os.path.exists(img_f):
 							urllib.urlretrieve(img_src,img_f)
 						img_html = img_template % img_nn
 						#handle hotspots
-						hotspots = sketch_container.find_elements_by_class_name('hotspot')
+						hotspots_container = sketch_container.find_element_by_class_name('litetooltip-hotspot-container')
+						hotspots = hotspots_container.find_elements_by_class_name('hotspot')
 						multi_html = []
 						for index,hs in enumerate(hotspots):	
 							x = hs.get_attribute('data-hotspot-x')
