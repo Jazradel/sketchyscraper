@@ -7,8 +7,10 @@ import time
 import os
 import urllib
 import csv
-import auth
-			
+
+userName = "?"
+password = "?"
+
 main_url = "https://www.sketchymedical.com/courses"
 
 img_template = """<img src="%s" />"""
@@ -30,8 +32,8 @@ time.sleep(1) #this doesn't help. sometimes the password form just won't fill
 user = driver.find_element_by_xpath("//input[@type='email']")
 pass2 = driver.find_element_by_xpath("//input[@type='password']")
 
-user.send_keys(auth.userName)
-pass2.send_keys(auth.password)
+user.send_keys(userName)
+pass2.send_keys(password)
 loginform = driver.find_element_by_class_name('btn-signin')
 loginform.click()
 
