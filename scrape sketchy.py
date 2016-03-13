@@ -54,7 +54,7 @@ def mktag(string):
 	return string.strip().replace(' ','_').lower()
 	
 def str2fn(string):
-	return string.replace("/",",").strip()
+	return string.replace("/",",").replace(':',"").strip()
 	#return "".join([c for c in string if c.isalpha() or c.isdigit() or c==' ']).rstrip()
 	
 def splittitle(elem):
