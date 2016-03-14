@@ -51,7 +51,7 @@ def cleanelem(elem):
 	return cleantxt(elem.get_attribute("textContent"))
 
 def mktag(string):
-	return string.strip().replace(' ','_').lower()
+	return string.strip().replace(' ','_').replace(':','').replace("&","and").lower()
 	
 def str2fn(string):
 	return string.replace("/",",").replace(':',"").strip()
