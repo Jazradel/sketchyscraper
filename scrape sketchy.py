@@ -8,8 +8,13 @@ import os
 import urllib
 import csv
 
-userName = "?"
-password = "?"
+try:
+	import auth
+	userName = auth.userName
+	password = auth.password
+except:
+	userName = "?"
+	password = "?"
 
 main_url = "https://www.sketchymedical.com/courses"
 
@@ -30,10 +35,11 @@ element = wait.until(EC.element_to_be_clickable((By.XPATH,"//input[@type='email'
 time.sleep(1) #this doesn't help. sometimes the password form just won't fill
 	
 user = driver.find_element_by_xpath("//input[@type='email']")
-pass2 = driver.find_element_by_xpath("//input[@type='password']")
-
 user.send_keys(userName)
+
+pass2 = driver.find_element_by_xpath("//input[@type='password']")
 pass2.send_keys(password)
+
 loginform = driver.find_element_by_class_name('btn-signin')
 loginform.click()
 
@@ -42,7 +48,7 @@ element = wait.until(EC.element_to_be_clickable((By.CLASS_NAME,"btn-success")))
 def click(driver,object):
 	driver.execute_script("return arguments[0].scrollIntoView();", object)
 	object.click()
-	time.sleep(1)
+	time.sleep(0.5)
 
 def cleantxt(string):
 	return string.encode('ascii', 'xmlcharrefreplace').strip()
@@ -54,7 +60,7 @@ def mktag(string):
 	return string.strip().replace(' ','_').replace(':','').replace("&","and").lower()
 	
 def str2fn(string):
-	return string.replace("/",",").replace(':',"").strip()
+	return string.replace("/",",").strip()
 	#return "".join([c for c in string if c.isalpha() or c.isdigit() or c==' ']).rstrip()
 	
 def splittitle(elem):
@@ -62,11 +68,15 @@ def splittitle(elem):
 	num = cleantxt(header[0])
 	name = cleantxt("-".join(header[1:]))
 	return num, name
+
+output_dir = 'output'	
+if not os.path.exists(output_dir):
+	os.mkdir(output_dir)
 	
 chapter = ""
-with open(os.path.join("output","output_multi.tsv"),'w') as output_file:
+with open(os.path.join(output_dir,"output_multi.tsv"),'w') as output_file:
 	out_multi = csv.writer(output_file,delimiter='\t')
-	with open(os.path.join("output","output.tsv"),'w') as output_file:
+	with open(os.path.join(output_dir,"output.tsv"),'w') as output_file:
 		out = csv.writer(output_file,delimiter='\t')
 		#count the number of buttons. for historical reasons only. not  necessary, could just while until view_buttons[ii] not found. 
 		view_buttons = driver.find_elements_by_class_name('btn-success')
@@ -115,7 +125,7 @@ with open(os.path.join("output","output_multi.tsv"),'w') as output_file:
 							spot_html = spot_template % (x, y)
 							sol_html = sol_template %  (x, y, txt)
 							multi_html.append("%s%s" % (spot_html, sol_html))
-							title = "%s::%s - %s::%s - %s" % (section, chp_num, chp_name, sketch_num, sketch_name)
+							title = "%s :: %s - %s :: %s - %s" % (section, chp_num, chp_name, sketch_num, sketch_name)
 							out.writerow([title,section,chp_num,chp_name,sketch_num,sketch_name,index,img_html,spot_html,sol_html,tags,img_nn,dw,dh,x,y,txt])
 						out_multi.writerow([title,section,chp_num,chp_name,sketch_num,sketch_name,img_html,"\n".join(multi_html),tags])
 						#print image_container.get_attribute('innerHTML')
